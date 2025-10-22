@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
+import { useNavigateToLogin } from "@/hooks/use-navigate-to-login"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,6 +17,15 @@ const ProductRegistration = () => {
   const [images, setImages] = useState<File[]>([])
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { user } = useAuth()
+  const navigateToLogin = useNavigateToLogin()
+
+  // Redirect to login if not authenticated, with target URL
+  useEffect(() => {
+    if (!user) {
+      navigateToLogin("/products/new")
+    }
+  }, [user, navigateToLogin])
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])

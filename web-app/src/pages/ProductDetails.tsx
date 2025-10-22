@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowLeft } from "lucide-react"
+import { useNavigateToLogin } from "@/hooks/use-navigate-to-login"
 
 const ProductDetails = () => {
   const { id } = useParams()
@@ -18,7 +19,7 @@ const ProductDetails = () => {
   const { toast } = useToast()
   const [showOfferDialog, setShowOfferDialog] = useState(false)
   const [offerPrice, setOfferPrice] = useState("")
-
+  const navigateToLogin = useNavigateToLogin()
   const product = mockProducts.find((p) => p.id === id)
   const seller = mockUsers.find((u) => u.id === product?.sellerId)
   const productOffers = mockOffers.filter((o) => o.productId === id)
@@ -110,7 +111,16 @@ const ProductDetails = () => {
 
             <p className="text-foreground">{product.description}</p>
 
-            {isBuyer && product.status === "Available" && (
+            {!user && product.status === "Available" && (
+              <div className="space-y-2">
+                <div className="rounded-lg bg-muted p-4 text-center">
+                  <p className="text-sm text-muted-foreground mb-2">Login to purchase this item or make an offer</p>
+                  <Button onClick={() => navigateToLogin("/products/" + id)}>Login to Buy</Button>
+                </div>
+              </div>
+            )}
+
+            {user && isBuyer && product.status === "Available" && (
               <div className="space-y-2">
                 {canPurchase && (
                   <Button className="w-full" onClick={handlePurchase}>
@@ -125,11 +135,11 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {isBuyer && isReservedForAnotherBuyer && (
+            {user && isBuyer && isReservedForAnotherBuyer && (
               <p className="text-sm text-muted-foreground">This product is reserved for another buyer</p>
             )}
 
-            {productOffers.length > 0 && (
+            {user && productOffers.length > 0 && (
               <Card>
                 <CardContent className="p-6">
                   <h2 className="mb-4 text-xl font-semibold">Negotiation History</h2>

@@ -1,0 +1,1 @@
+- Anonymous (not logged-in) users can browse and view product listings, including viewing product details. However, they must log in to perform any actions, such as creating new listings, making offers, or reserving/buying products. Any attempt to access a protected function will prompt the user to log in.

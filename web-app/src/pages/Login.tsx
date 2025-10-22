@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,15 +10,24 @@ import { useToast } from "@/hooks/use-toast"
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const { login } = useAuth()
+  const { login, user } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const [searchParams] = useSearchParams()
+  const target = searchParams.get("target") || "/products"
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate(target)
+    }
+  }, [user, navigate, target])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const success = login(email, password)
     if (success) {
-      navigate("/products")
+      navigate(target)
     } else {
       toast({
         title: "Login failed",
