@@ -28,7 +28,11 @@ export const mockProducts: Product[] = [
     price: 250,
     description:
       'Classic 35mm film camera in excellent condition. Perfect for photography enthusiasts.',
-    images: ['https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&h=500&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=500&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1495121553079-4c61bcce1894?w=500&h=500&fit=crop',
+    ],
     sellerId: '1',
     status: 'Available',
   },
@@ -37,7 +41,10 @@ export const mockProducts: Product[] = [
     name: 'Designer Leather Jacket',
     price: 450,
     description: 'Genuine leather jacket, size M. Barely worn, like new condition.',
-    images: ['https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1520975954732-35dd22299614?w=500&h=500&fit=crop',
+    ],
     sellerId: '2',
     status: 'Available',
   },
@@ -67,6 +74,31 @@ export const mockProducts: Product[] = [
     description: 'Latest model smartwatch with fitness tracking and heart rate monitor.',
     images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop'],
     sellerId: '2',
+    status: 'Available',
+  },
+  {
+    id: '6',
+    name: 'Professional Camera Kit',
+    price: 850,
+    description:
+      'Complete photography kit including DSLR camera, multiple lenses, tripod, and accessories. Perfect for professional photographers or serious hobbyists.',
+    images: [
+      'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=500&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=500&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=500&h=500&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=500&h=500&fit=crop',
+    ],
+    sellerId: '1',
+    status: 'Available',
+  },
+  {
+    id: '7',
+    name: 'Vintage Book Collection',
+    price: 75,
+    description:
+      'Rare collection of vintage books from the 1950s. Great condition, perfect for collectors or literature enthusiasts. No photos available - contact seller for viewing.',
+    images: [],
+    sellerId: '3',
     status: 'Available',
   },
 ]

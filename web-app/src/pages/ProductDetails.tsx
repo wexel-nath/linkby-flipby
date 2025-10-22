@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { Header } from '@/components/Header'
+import { ImageCarousel } from '@/components/ImageCarousel'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -91,17 +92,7 @@ const ProductDetails = () => {
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
             <div className="aspect-square overflow-hidden rounded-lg bg-muted">
-              {product.images[0] ? (
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
-                  No Image
-                </div>
-              )}
+              <ImageCarousel images={product.images} altPrefix={product.name} />
             </div>
           </div>
 
