@@ -17,8 +17,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
-import { mockOffers, mockProducts } from '@/data/mockData'
 import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
+import { useProductWithOffers } from '@/hooks/use-offers'
 import { useToast } from '@/hooks/use-toast'
 import { OfferBy, ProductStatus } from '@/types'
 
@@ -42,20 +42,25 @@ const ProductDetails = () => {
   const [offerPrice, setOfferPrice] = useState('')
   const navigateToLogin = useNavigateToLogin()
 
-  const product = mockProducts.find((p) => p.id === id)
+  const { product, offers: productOffers, isLoading } = useProductWithOffers(id || '')
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>
+    )
+  }
+
   if (!product) {
     return <div>Product not found</div>
   }
 
-  const productOffers = mockOffers
-    .filter((o) => o.productId === id)
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  const sortedOffers = productOffers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
   const isSeller = user?.id === product.sellerId
 
-  const userOffers = productOffers.filter((o) => o.userId === user?.id)
+  const userOffers = sortedOffers.filter((o) => o.userId === user?.id)
   const hasActiveOffer = userOffers.length > 0
-  const lastOffer = productOffers[0]
+  const lastOffer = sortedOffers[0]
   const canPurchase =
     !hasActiveOffer ||
     (lastOffer && !!lastOffer.acceptedAt) ||
@@ -158,11 +163,11 @@ const ProductDetails = () => {
               </p>
             )}
 
-            {user && productOffers.length > 0 && (
+            {user && sortedOffers.length > 0 && (
               <div>
                 <h2 className="mb-4 text-xl font-semibold">Negotiation History</h2>
                 <div className="space-y-4">
-                  {productOffers.map((offer, index) => {
+                  {sortedOffers.map((offer, index) => {
                     const isActionable =
                       index === 0 &&
                       !offer.acceptedAt &&

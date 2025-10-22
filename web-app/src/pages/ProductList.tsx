@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { ProductCard } from '@/components/ProductCard'
 import { useAuth } from '@/contexts/AuthContext'
-import { mockProducts } from '@/data/mockData'
+import { useProducts } from '@/hooks/use-products'
 
 const ProductList = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { products, isLoading } = useProducts()
 
   const title = user ? `Hi, ${user.name}!` : 'Browse our marketplace!'
 
@@ -21,15 +22,19 @@ const ProductList = () => {
         {!user && (
           <p className="text-sm text-muted-foreground mt-2">Login to make purchases or offers.</p>
         )}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
-          {mockProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onClick={() => navigate(`/products/${product.id}`)}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="text-center py-8">Loading products...</div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onClick={() => navigate(`/products/${product.id}`)}
+              />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   )
