@@ -5,7 +5,7 @@ import { errorHandler } from './middleware'
 import { routes } from './routes'
 
 const app = express()
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT || 8080
 
 // Middleware
 app.use(cors())
@@ -19,8 +19,7 @@ app.use(errorHandler)
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`)
-  console.log(`📊 Health check: http://localhost:${PORT}/api/healthz`)
+  console.log(`Server: running on port ${PORT}`)
 })
 
 export default app
