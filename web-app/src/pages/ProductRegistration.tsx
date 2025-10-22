@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { CurrencySelector } from '@/components/CurrencySelector'
+import { Header } from '@/components/Header'
 import { ImageUploader } from '@/components/ImageUploader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -41,13 +42,10 @@ const ProductRegistration = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">Register New Product</h1>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto max-w-2xl px-4 py-8">
+        <h1 className="text-2xl font-bold mb-4">Register New Product</h1>
         <Card>
           <CardHeader>
             <CardTitle>Product Details</CardTitle>
@@ -55,7 +53,7 @@ const ProductRegistration = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
               </div>
 
@@ -91,7 +89,7 @@ const ProductRegistration = () => {
                 />
               </div>
 
-              <ImageUploader images={images} onImagesChange={setImages} label="Product Images" />
+              <ImageUploader images={images} onImagesChange={setImages} label="Images" />
 
               <div className="flex gap-4">
                 <Button type="submit" className="flex-1">

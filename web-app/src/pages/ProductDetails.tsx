@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { Header } from '@/components/Header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -80,16 +81,13 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate('/products')}>
-            <ArrowLeft className="mr-2" />
-            Back to Products
-          </Button>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto max-w-5xl px-4 py-8">
+        <Button variant="ghost" onClick={() => navigate('/products')} className="mb-6">
+          <ArrowLeft className="mr-2" />
+          Back to Products
+        </Button>
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
             <div className="aspect-square overflow-hidden rounded-lg bg-muted">

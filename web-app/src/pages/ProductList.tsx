@@ -1,66 +1,32 @@
-import { LogOut, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
+import { Header } from '@/components/Header'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
 import { mockProducts, mockUsers } from '@/data/mockData'
-import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
 
 const ProductList = () => {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
-  const navigateToLogin = useNavigateToLogin()
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
 
   const getSellerName = (sellerId: string) => {
     return mockUsers.find((u) => u.id === sellerId)?.name || 'Unknown'
   }
 
+  const title = user ? `Hi, ${user.name}!` : 'Browse our marketplace!'
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <h1 className="text-2xl font-bold">Flipby</h1>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <span className="text-sm text-muted-foreground">Hi, {user.name}!</span>
-                <div className="flex gap-2">
-                  <Button onClick={() => navigate('/products/new')}>
-                    <Plus className="mr-2" />
-                    Sell
-                  </Button>
-                  <Button variant="outline" onClick={handleLogout}>
-                    <LogOut className="mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <span className="text-sm text-muted-foreground">Browse our marketplace</span>
-                <Button onClick={() => navigateToLogin()}>Login</Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-4">{title}</h1>
+        <p className="text-sm text-muted-foreground">Click any product to view details.</p>
         {!user && (
-          <div className="mb-6 rounded-lg bg-muted p-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Browse our marketplace! Click any product to view details. Login to make purchases or
-              offers.
-            </p>
-          </div>
+          <p className="text-sm text-muted-foreground mt-2">Login to make purchases or offers.</p>
         )}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
           {mockProducts.map((product) => (
             <Card
               key={product.id}
