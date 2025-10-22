@@ -4,9 +4,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { Header } from '@/components/Header'
 import { ImageCarousel } from '@/components/ImageCarousel'
-import { Badge } from '@/components/ui/badge'
+import { OfferItem } from '@/components/OfferItem'
+import { Badge, BadgeProps } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -17,9 +17,21 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
-import { mockOffers, mockProducts, mockUsers } from '@/data/mockData'
+import { mockOffers, mockProducts } from '@/data/mockData'
 import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
 import { useToast } from '@/hooks/use-toast'
+import { OfferBy, ProductStatus } from '@/types'
+
+const getProductBadgeVariant = (status: ProductStatus): BadgeProps['variant'] => {
+  switch (status) {
+    case ProductStatus.Sold:
+      return 'destructive'
+    case ProductStatus.Reserved:
+      return 'secondary'
+    default:
+      return 'default'
+  }
+}
 
 const ProductDetails = () => {
   const { id } = useParams()
@@ -29,33 +41,35 @@ const ProductDetails = () => {
   const [showOfferDialog, setShowOfferDialog] = useState(false)
   const [offerPrice, setOfferPrice] = useState('')
   const navigateToLogin = useNavigateToLogin()
-  const product = mockProducts.find((p) => p.id === id)
-  const seller = mockUsers.find((u) => u.id === product?.sellerId)
-  const productOffers = mockOffers.filter((o) => o.productId === id)
 
+  const product = mockProducts.find((p) => p.id === id)
   if (!product) {
     return <div>Product not found</div>
   }
 
+  const productOffers = mockOffers
+    .filter((o) => o.productId === id)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
   const isSeller = user?.id === product.sellerId
-  const isBuyer = user?.id !== product.sellerId
-  const userOffers = productOffers.filter((o) => o.buyerId === user?.id)
+
+  const userOffers = productOffers.filter((o) => o.userId === user?.id)
   const hasActiveOffer = userOffers.length > 0
-  const lastOffer = productOffers[productOffers.length - 1]
+  const lastOffer = productOffers[0]
   const canPurchase =
     !hasActiveOffer ||
-    (lastOffer && lastOffer.accepted) ||
-    (lastOffer && lastOffer.offerBy === 'buyer' && lastOffer.accepted)
+    (lastOffer && !!lastOffer.acceptedAt) ||
+    (lastOffer && lastOffer.offerBy === OfferBy.Buyer && !!lastOffer.acceptedAt)
 
   const isReservedForAnotherBuyer =
-    product.status === 'Reserved' && product.reservedForBuyerId !== user?.id
+    product.status === ProductStatus.Reserved && product.reservedForBuyerId !== user?.id
 
   const handlePurchase = () => {
     toast({
       title: 'Purchase complete',
       description: 'Product marked as sold',
     })
-    navigate('/products')
+    navigate('/')
   }
 
   const handleMakeOffer = () => {
@@ -77,7 +91,7 @@ const ProductDetails = () => {
 
   const handleAcceptOffer = () => {
     toast({ title: 'Offer accepted', description: 'Product is now reserved' })
-    navigate('/products')
+    navigate('/')
   }
 
   return (
@@ -85,7 +99,7 @@ const ProductDetails = () => {
       <Header />
 
       <main className="container mx-auto max-w-5xl px-4 py-8">
-        <Button variant="ghost" onClick={() => navigate('/products')} className="mb-6">
+        <Button variant="ghost" onClick={() => navigate('/')} className="mb-6">
           <ArrowLeft className="mr-2" />
           Back to Products
         </Button>
@@ -100,25 +114,15 @@ const ProductDetails = () => {
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <h1 className="text-3xl font-bold">{product.name}</h1>
-                <Badge
-                  variant={
-                    product.status === 'Sold'
-                      ? 'destructive'
-                      : product.status === 'Reserved'
-                        ? 'secondary'
-                        : 'default'
-                  }
-                >
-                  {product.status}
-                </Badge>
+                <Badge variant={getProductBadgeVariant(product.status)}>{product.status}</Badge>
               </div>
-              <p className="text-2xl font-bold text-primary">${product.price}</p>
-              <p className="text-sm text-muted-foreground">Sold by {seller?.name}</p>
+              <p className="text-2xl font-bold text-primary">${product.priceAmount}</p>
+              <p className="text-sm text-muted-foreground">Listed by {product.sellerName}</p>
             </div>
 
             <p className="text-foreground">{product.description}</p>
 
-            {!user && product.status === 'Available' && (
+            {!user && product.status === ProductStatus.Available && (
               <div className="space-y-2">
                 <div className="rounded-lg bg-muted p-4 text-center">
                   <p className="text-sm text-muted-foreground mb-2">
@@ -129,7 +133,7 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {user && isBuyer && product.status === 'Available' && (
+            {user && !isSeller && product.status === ProductStatus.Available && (
               <div className="space-y-2">
                 {canPurchase && (
                   <Button className="w-full" onClick={handlePurchase}>
@@ -148,74 +152,35 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {user && isBuyer && isReservedForAnotherBuyer && (
+            {user && !isSeller && isReservedForAnotherBuyer && (
               <p className="text-sm text-muted-foreground">
                 This product is reserved for another buyer
               </p>
             )}
 
             {user && productOffers.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="mb-4 text-xl font-semibold">Negotiation History</h2>
-                  <div className="space-y-4">
-                    {productOffers.map((offer) => {
-                      const offerUser = mockUsers.find((u) => u.id === offer.buyerId)
-                      return (
-                        <div
-                          key={offer.id}
-                          className="flex items-center justify-between border-b border-border pb-4 last:border-0"
-                        >
-                          <div>
-                            <p className="font-medium">
-                              {offer.offerBy === 'buyer' ? offerUser?.name : seller?.name}
-                              <span className="ml-2 text-sm text-muted-foreground">
-                                ({offer.offerBy})
-                              </span>
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {offer.timestamp.toLocaleString()}
-                            </p>
-                            <p className="font-semibold">${offer.price}</p>
-                          </div>
-                          {offer.accepted && <Badge variant="secondary">Accepted</Badge>}
-                          {!offer.accepted && isSeller && offer.offerBy === 'buyer' && (
-                            <div className="flex gap-2">
-                              <Button size="sm" onClick={handleAcceptOffer}>
-                                Accept
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setShowOfferDialog(true)}
-                              >
-                                Counter
-                              </Button>
-                            </div>
-                          )}
-                          {!offer.accepted &&
-                            isBuyer &&
-                            offer.offerBy === 'seller' &&
-                            offer.buyerId === user?.id && (
-                              <div className="flex gap-2">
-                                <Button size="sm" onClick={handleAcceptOffer}>
-                                  Accept
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => setShowOfferDialog(true)}
-                                >
-                                  Counter
-                                </Button>
-                              </div>
-                            )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+              <div>
+                <h2 className="mb-4 text-xl font-semibold">Negotiation History</h2>
+                <div className="space-y-4">
+                  {productOffers.map((offer, index) => {
+                    const isActionable =
+                      index === 0 &&
+                      !offer.acceptedAt &&
+                      ((isSeller && offer.offerBy === OfferBy.Buyer) ||
+                        (!isSeller && offer.offerBy === OfferBy.Seller))
+
+                    return (
+                      <OfferItem
+                        key={offer.id}
+                        offer={offer}
+                        isActionable={isActionable}
+                        onAcceptOffer={handleAcceptOffer}
+                        onMakeCounterOffer={() => setShowOfferDialog(true)}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
             )}
           </div>
         </div>

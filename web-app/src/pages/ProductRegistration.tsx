@@ -37,7 +37,7 @@ const ProductRegistration = () => {
       title: 'Product registered',
       description: 'Your product has been listed successfully',
     })
-    navigate('/products')
+    navigate('/')
   }
 
   return (
@@ -99,7 +99,7 @@ const ProductRegistration = () => {
                   type="button"
                   variant="outline"
                   className="flex-1"
-                  onClick={() => navigate('/products')}
+                  onClick={() => navigate('/')}
                 >
                   Cancel
                 </Button>

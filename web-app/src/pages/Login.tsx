@@ -15,7 +15,7 @@ const Login = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [searchParams] = useSearchParams()
-  const target = searchParams.get('target') || '/products'
+  const target = searchParams.get('target') || '/'
 
   // Redirect if already logged in
   useEffect(() => {

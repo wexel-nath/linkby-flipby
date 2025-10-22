@@ -1,7 +1,12 @@
-export type ProductStatus = 'Available' | 'Reserved' | 'Sold'
+export enum ProductStatus {
+  Available = 'Available',
+  Reserved = 'Reserved',
+  Sold = 'Sold',
+}
 
 export interface User {
   id: string
+  createdAt: Date
   email: string
   name: string
   password: string
@@ -9,21 +14,30 @@ export interface User {
 
 export interface Product {
   id: string
+  createdAt: Date
+  sellerId: string
+  sellerName: string
   name: string
-  price: number
+  priceAmount: number
+  priceCurrency: string
   description: string
   images: string[]
-  sellerId: string
   status: ProductStatus
   reservedForBuyerId?: string
 }
 
+export enum OfferBy {
+  Buyer = 'Buyer',
+  Seller = 'Seller',
+}
+
 export interface Offer {
   id: string
+  createdAt: Date
   productId: string
-  buyerId: string
-  price: number
-  timestamp: Date
-  offerBy: 'buyer' | 'seller'
-  accepted: boolean
+  userId: string
+  offerBy: OfferBy
+  offerByName: string
+  priceAmount: number
+  acceptedAt?: Date
 }
