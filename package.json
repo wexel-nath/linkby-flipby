@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev:web": "cd web-app && npm run dev",
+    "dev:server": "cd server && npm run dev",
     "format": "prettier --write \"web-app/src/**/*.{ts,tsx}\" \"server/**/*.{ts,js}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
