@@ -56,7 +56,7 @@ const ProductDetails = () => {
 
   const sortedOffers = productOffers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
-  const isSeller = user?.id === product.sellerId
+  const isSeller = user?.id === product.userId
 
   const userOffers = sortedOffers.filter((o) => o.userId === user?.id)
   const hasActiveOffer = userOffers.length > 0
@@ -122,7 +122,7 @@ const ProductDetails = () => {
                 <Badge variant={getProductBadgeVariant(product.status)}>{product.status}</Badge>
               </div>
               <p className="text-2xl font-bold text-primary">${product.priceAmount}</p>
-              <p className="text-sm text-muted-foreground">Listed by {product.sellerName}</p>
+              <p className="text-sm text-muted-foreground">Listed by {product.listedByName}</p>
             </div>
 
             <p className="text-foreground">{product.description}</p>

@@ -15,8 +15,8 @@ export interface User {
 export interface Product {
   id: string
   createdAt: Date
-  sellerId: string
-  sellerName: string
+  userId: string
+  listedByName: string
   name: string
   priceAmount: number
   priceCurrency: string

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { mockOffers } from '@/data/mockData'
-import { Offer } from '@/types'
+import { Offer, Product } from '@/types'
 
 export const useOffersByProduct = (productId: string) => {
   const [offers, setOffers] = useState<Offer[]>([])
@@ -51,7 +51,7 @@ export const useOffersByProduct = (productId: string) => {
 
 // Combined hook for product with its offers
 export const useProductWithOffers = (productId: string) => {
-  const [product, setProduct] = useState<any>(null)
+  const [product, setProduct] = useState<Product | null>(null)
   const [offers, setOffers] = useState<Offer[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
