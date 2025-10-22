@@ -1,20 +1,21 @@
-import { useState, useEffect } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom"
-import { useAuth } from "@/contexts/AuthContext"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/hooks/use-toast'
 
 const Login = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const { login, user } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
   const [searchParams] = useSearchParams()
-  const target = searchParams.get("target") || "/products"
+  const target = searchParams.get('target') || '/products'
 
   // Redirect if already logged in
   useEffect(() => {
@@ -30,9 +31,9 @@ const Login = () => {
       navigate(target)
     } else {
       toast({
-        title: "Login failed",
-        description: "Invalid email or password",
-        variant: "destructive"
+        title: 'Login failed',
+        description: 'Invalid email or password',
+        variant: 'destructive',
       })
     }
   }
@@ -73,7 +74,8 @@ const Login = () => {
             </Button>
           </form>
           <p className="mt-4 text-sm text-muted-foreground">
-            Demo accounts: john@example.com, jane@example.com, bob@example.com (password: password123)
+            Demo accounts: john@example.com, jane@example.com, bob@example.com (password:
+            password123)
           </p>
         </CardContent>
       </Card>

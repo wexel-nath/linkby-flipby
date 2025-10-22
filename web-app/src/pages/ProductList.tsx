@@ -1,11 +1,12 @@
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/contexts/AuthContext"
-import { mockProducts, mockUsers } from "@/data/mockData"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { LogOut, Plus } from "lucide-react"
-import { useNavigateToLogin } from "@/hooks/use-navigate-to-login"
+import { LogOut, Plus } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { useAuth } from '@/contexts/AuthContext'
+import { mockProducts, mockUsers } from '@/data/mockData'
+import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
 
 const ProductList = () => {
   const { user, logout } = useAuth()
@@ -13,11 +14,11 @@ const ProductList = () => {
   const navigateToLogin = useNavigateToLogin()
   const handleLogout = () => {
     logout()
-    navigate("/")
+    navigate('/')
   }
 
   const getSellerName = (sellerId: string) => {
-    return mockUsers.find((u) => u.id === sellerId)?.name || "Unknown"
+    return mockUsers.find((u) => u.id === sellerId)?.name || 'Unknown'
   }
 
   return (
@@ -30,7 +31,7 @@ const ProductList = () => {
               <>
                 <span className="text-sm text-muted-foreground">Hi, {user.name}!</span>
                 <div className="flex gap-2">
-                  <Button onClick={() => navigate("/products/new")}>
+                  <Button onClick={() => navigate('/products/new')}>
                     <Plus className="mr-2" />
                     Sell
                   </Button>
@@ -54,7 +55,8 @@ const ProductList = () => {
         {!user && (
           <div className="mb-6 rounded-lg bg-muted p-4 text-center">
             <p className="text-sm text-muted-foreground">
-              Browse our marketplace! Click any product to view details. Login to make purchases or offers.
+              Browse our marketplace! Click any product to view details. Login to make purchases or
+              offers.
             </p>
           </div>
         )}
@@ -67,14 +69,20 @@ const ProductList = () => {
             >
               <div className="relative aspect-square overflow-hidden rounded-t-lg">
                 {product.images[0] ? (
-                  <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-muted">No Image</div>
+                  <div className="flex h-full w-full items-center justify-center bg-muted">
+                    No Image
+                  </div>
                 )}
-                {(product.status === "Reserved" || product.status === "Sold") && (
+                {(product.status === 'Reserved' || product.status === 'Sold') && (
                   <Badge
                     className="absolute bottom-2 right-2"
-                    variant={product.status === "Sold" ? "destructive" : "secondary"}
+                    variant={product.status === 'Sold' ? 'destructive' : 'secondary'}
                   >
                     {product.status}
                   </Badge>
@@ -83,7 +91,9 @@ const ProductList = () => {
               <CardContent className="p-4">
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-lg font-bold text-primary">${product.price}</p>
-                <p className="text-sm text-muted-foreground">Sold by {getSellerName(product.sellerId)}</p>
+                <p className="text-sm text-muted-foreground">
+                  Sold by {getSellerName(product.sellerId)}
+                </p>
               </CardContent>
             </Card>
           ))}

@@ -1,4 +1,4 @@
-export type ProductStatus = "Available" | "Reserved" | "Sold"
+export type ProductStatus = 'Available' | 'Reserved' | 'Sold'
 
 export interface User {
   id: string
@@ -24,6 +24,6 @@ export interface Offer {
   buyerId: string
   price: number
   timestamp: Date
-  offerBy: "buyer" | "seller"
+  offerBy: 'buyer' | 'seller'
   accepted: boolean
 }

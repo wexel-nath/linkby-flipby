@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/contexts/AuthContext"
-import { useNavigateToLogin } from "@/hooks/use-navigate-to-login"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
-import { Upload, X } from "lucide-react"
+import { useEffect, useState } from 'react'
+import { Upload, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { useAuth } from '@/contexts/AuthContext'
+import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
+import { useToast } from '@/hooks/use-toast'
 
 const ProductRegistration = () => {
-  const [name, setName] = useState("")
-  const [price, setPrice] = useState("")
-  const [description, setDescription] = useState("")
+  const [name, setName] = useState('')
+  const [price, setPrice] = useState('')
+  const [description, setDescription] = useState('')
   const [images, setImages] = useState<File[]>([])
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -23,7 +24,7 @@ const ProductRegistration = () => {
   // Redirect to login if not authenticated, with target URL
   useEffect(() => {
     if (!user) {
-      navigateToLogin("/products/new")
+      navigateToLogin('/products/new')
     }
   }, [user, navigateToLogin])
 
@@ -32,9 +33,9 @@ const ProductRegistration = () => {
 
     if (images.length + files.length > 5) {
       toast({
-        title: "Too many images",
-        description: "Maximum 5 images allowed per product",
-        variant: "destructive"
+        title: 'Too many images',
+        description: 'Maximum 5 images allowed per product',
+        variant: 'destructive',
       })
       return
     }
@@ -42,9 +43,9 @@ const ProductRegistration = () => {
     const validFiles = files.filter((file) => {
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: "File too large",
+          title: 'File too large',
           description: `${file.name} exceeds 5MB limit`,
-          variant: "destructive"
+          variant: 'destructive',
         })
         return false
       }
@@ -61,10 +62,10 @@ const ProductRegistration = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     toast({
-      title: "Product registered",
-      description: "Your product has been listed successfully"
+      title: 'Product registered',
+      description: 'Your product has been listed successfully',
     })
-    navigate("/products")
+    navigate('/products')
   }
 
   return (
@@ -136,7 +137,13 @@ const ProductRegistration = () => {
                     <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-muted transition-colors hover:bg-accent">
                       <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Upload</span>
-                      <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
                     </label>
                   )}
                 </div>
@@ -146,7 +153,12 @@ const ProductRegistration = () => {
                 <Button type="submit" className="flex-1">
                   Submit
                 </Button>
-                <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/products")}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => navigate('/products')}
+                >
                   Cancel
                 </Button>
               </div>

@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState } from "react"
-import { User } from "@/types"
-import { mockUsers } from "@/data/mockData"
+import React, { createContext, useContext, useState } from 'react'
+
+import { mockUsers } from '@/data/mockData'
+import { User } from '@/types'
 
 interface AuthContextType {
   user: User | null
@@ -32,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider")
+    throw new Error('useAuth must be used within AuthProvider')
   }
   return context
 }
