@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Upload, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
+import { CurrencySelector } from '@/components/CurrencySelector'
+import { ImageUploader } from '@/components/ImageUploader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -13,7 +14,8 @@ import { useToast } from '@/hooks/use-toast'
 
 const ProductRegistration = () => {
   const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
+  const [amount, setAmount] = useState('')
+  const [currency, setCurrency] = useState('USD')
   const [description, setDescription] = useState('')
   const [images, setImages] = useState<File[]>([])
   const navigate = useNavigate()
@@ -27,37 +29,6 @@ const ProductRegistration = () => {
       navigateToLogin('/products/new')
     }
   }, [user, navigateToLogin])
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-
-    if (images.length + files.length > 5) {
-      toast({
-        title: 'Too many images',
-        description: 'Maximum 5 images allowed per product',
-        variant: 'destructive',
-      })
-      return
-    }
-
-    const validFiles = files.filter((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: 'File too large',
-          description: `${file.name} exceeds 5MB limit`,
-          variant: 'destructive',
-        })
-        return false
-      }
-      return true
-    })
-
-    setImages([...images, ...validFiles])
-  }
-
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index))
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,16 +60,24 @@ const ProductRegistration = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
-                />
+                <Label>Price</Label>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Input
+                      id="amount"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="Amount"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="w-48">
+                    <CurrencySelector value={currency} onValueChange={setCurrency} />
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -112,42 +91,7 @@ const ProductRegistration = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Product Images (Max 5, up to 5MB each)</Label>
-                <div className="grid grid-cols-3 gap-4">
-                  {images.map((file, index) => (
-                    <div key={index} className="relative aspect-square">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Preview ${index + 1}`}
-                        className="h-full w-full rounded-md object-cover"
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="destructive"
-                        className="absolute right-1 top-1 h-6 w-6"
-                        onClick={() => removeImage(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  {images.length < 5 && (
-                    <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-muted transition-colors hover:bg-accent">
-                      <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Upload</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="hidden"
-                        onChange={handleImageUpload}
-                      />
-                    </label>
-                  )}
-                </div>
-              </div>
+              <ImageUploader images={images} onImagesChange={setImages} label="Product Images" />
 
               <div className="flex gap-4">
                 <Button type="submit" className="flex-1">
