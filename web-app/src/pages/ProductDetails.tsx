@@ -122,7 +122,7 @@ const ProductDetails = () => {
                 <Badge variant={getProductBadgeVariant(product.status)}>{product.status}</Badge>
               </div>
               <p className="text-2xl font-bold text-primary">${product.priceAmount}</p>
-              <p className="text-sm text-muted-foreground">Listed by {product.listedByName}</p>
+              <p className="text-sm text-muted-foreground">Listed by {product.userName}</p>
             </div>
 
             <p className="text-foreground">{product.description}</p>

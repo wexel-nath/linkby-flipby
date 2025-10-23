@@ -33,7 +33,7 @@ export const OfferItem = ({
         <div className="flex justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-medium">{offer.offerByName}</span>
+              <span className="font-medium">{offer.userName}</span>
               <Badge variant="outline" className="text-xs">
                 {offer.offerBy}
               </Badge>

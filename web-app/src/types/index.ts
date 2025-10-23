@@ -16,7 +16,7 @@ export interface Product {
   id: string
   createdAt: Date
   userId: string
-  listedByName: string
+  userName: string
   name: string
   priceAmount: number
   priceCurrency: string
@@ -36,8 +36,8 @@ export interface Offer {
   createdAt: Date
   productId: string
   userId: string
+  userName: string
   offerBy: OfferBy
-  offerByName: string
   priceAmount: number
   acceptedAt?: Date
 }

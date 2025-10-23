@@ -40,7 +40,6 @@ CREATE TABLE offer (
     product_id    UUID NOT NULL REFERENCES "product" (id),
     user_id       UUID NOT NULL REFERENCES "user" (id),
     offer_by      OFFER_BY NOT NULL,
-    offer_by_name TEXT NOT NULL,
     price_amount  INTEGER NOT NULL,
     accepted_at   TIMESTAMP WITH TIME ZONE
 );

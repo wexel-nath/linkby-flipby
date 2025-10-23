@@ -72,14 +72,13 @@ VALUES
     'Available'
   );
 
-INSERT INTO offer (created_at, product_id, user_id, offer_by, offer_by_name, price_amount)
+INSERT INTO offer (created_at, product_id, user_id, offer_by, price_amount)
 VALUES
   (
     NOW() - INTERVAL '1 hour',
     (SELECT id FROM "product" WHERE name = 'Gaming Laptop'),
     (SELECT id FROM "user" WHERE email = 'bob@example.com'),
     'Buyer',
-    'Bob Wilson',
     110000
   ),
   (
@@ -87,6 +86,5 @@ VALUES
     (SELECT id FROM "product" WHERE name = 'Gaming Laptop'),
     (SELECT id FROM "user" WHERE email = 'john@example.com'),
     'Seller',
-    'John Doe',
     115000
   );

@@ -25,7 +25,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
       <CardContent className="p-4">
         <h3 className="font-semibold">{product.name}</h3>
         <p className="text-lg font-bold text-primary">${product.priceAmount}</p>
-        <p className="text-sm text-muted-foreground">Listed by {product.listedByName}</p>
+        <p className="text-sm text-muted-foreground">Listed by {product.userName}</p>
       </CardContent>
     </Card>
   )

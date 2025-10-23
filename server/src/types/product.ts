@@ -8,7 +8,7 @@ export interface Product {
   id: string
   createdAt: Date
   userId: string
-  listedByName: string
+  userName: string
   name: string
   priceAmount: number
   priceCurrency: string

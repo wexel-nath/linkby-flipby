@@ -8,8 +8,8 @@ export interface Offer {
   createdAt: Date
   productId: string
   userId: string
+  userName: string
   offerBy: OfferBy
-  offerByName: string
   priceAmount: number
   acceptedAt?: Date
 }
@@ -17,6 +17,5 @@ export interface Offer {
 export interface CreateOfferRequest {
   productId: string
   offerBy: OfferBy
-  offerByName: string
   priceAmount: number
 }
