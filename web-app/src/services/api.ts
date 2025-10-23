@@ -60,6 +60,41 @@ class ApiService {
       }
     }
   }
+
+  async requestMultipart<T>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
+    try {
+      const headers: Record<string, string> = {}
+
+      // Add Authorization header if token exists
+      if (this.authToken) {
+        headers.Authorization = `Bearer ${this.authToken}`
+      }
+
+      // Don't set Content-Type for multipart - let browser set it with boundary
+
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      })
+
+      if (!response.ok) {
+        // Handle 401 Unauthorized - likely expired token
+        if (response.status === 401 && this.onUnauthorized) {
+          this.onUnauthorized()
+        }
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Multipart API request failed:', error)
+      return {
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+      }
+    }
+  }
 }
 
 export const apiService = new ApiService(config.apiBaseUrl)

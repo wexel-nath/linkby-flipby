@@ -11,6 +11,15 @@ export class ProductService {
     if (productData.priceAmount <= 0) {
       throw new Error('Price amount must be positive')
     }
+    if (!productData.priceCurrency) {
+      throw new Error('Price currency is required')
+    }
+    if (!productData.name) {
+      throw new Error('Name is required')
+    }
+    if (!productData.description) {
+      productData.description = ''
+    }
 
     // Default to empty array if images are not provided
     if (!productData.images) {
@@ -20,6 +29,8 @@ export class ProductService {
     if (productData.images.length > 5) {
       throw new Error('Maximum 5 images allowed')
     }
+
+    productData.status = ProductStatus.Available
 
     return productModel.create(productData, userId)
   }

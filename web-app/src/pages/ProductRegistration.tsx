@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
+import { useCreateProduct } from '@/hooks/use-products'
 import { useToast } from '@/hooks/use-toast'
 
 const ProductRegistration = () => {
@@ -23,6 +24,7 @@ const ProductRegistration = () => {
   const { toast } = useToast()
   const { user } = useAuth()
   const navigateToLogin = useNavigateToLogin()
+  const { createProduct, isLoading, error } = useCreateProduct()
 
   // Redirect to login if not authenticated, with target URL
   useEffect(() => {
@@ -31,13 +33,40 @@ const ProductRegistration = () => {
     }
   }, [user, navigateToLogin])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    toast({
-      title: 'Product registered',
-      description: 'Your product has been listed successfully',
-    })
-    navigate('/')
+
+    if (!name || !amount || !description) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      const productData = {
+        name,
+        priceAmount: parseInt(amount, 10),
+        priceCurrency: currency,
+        description,
+      }
+
+      await createProduct(productData, images)
+
+      toast({
+        title: 'Product registered',
+        description: 'Your product has been listed successfully',
+      })
+      navigate('/')
+    } catch (err) {
+      toast({
+        title: 'Registration Failed',
+        description: error || 'Failed to register product. Please try again.',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (
@@ -92,8 +121,8 @@ const ProductRegistration = () => {
               <ImageUploader images={images} onImagesChange={setImages} label="Images" />
 
               <div className="flex gap-4">
-                <Button type="submit" className="flex-1">
-                  Submit
+                <Button type="submit" className="flex-1" disabled={isLoading}>
+                  {isLoading ? 'Submitting...' : 'Submit'}
                 </Button>
                 <Button
                   type="button"

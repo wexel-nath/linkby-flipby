@@ -29,7 +29,7 @@ export const ImageCarousel = ({
             <img
               src={image}
               alt={`${altPrefix} ${index + 1}`}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           </CarouselItem>
         ))}

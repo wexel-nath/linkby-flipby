@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { apiService } from '@/services/api'
 import { Product, ProductStatus } from '@/types'
@@ -93,6 +93,57 @@ export const useProduct = (productId: string) => {
 
   return {
     product,
+    isLoading,
+    error,
+  }
+}
+
+export interface CreateProductData {
+  name: string
+  priceAmount: number
+  priceCurrency: string
+  description: string
+}
+
+export const useCreateProduct = () => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const createProduct = useCallback(async (productData: CreateProductData, images?: File[]) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const formData = new FormData()
+
+      // Add product data as JSON string
+      formData.append('productData', JSON.stringify(productData))
+
+      // Add images if provided
+      if (images && images.length > 0) {
+        images.forEach((image) => {
+          formData.append('images', image)
+        })
+      }
+
+      const response = await apiService.requestMultipart<Product>('/products', formData)
+
+      if (response.data) {
+        return response.data
+      } else {
+        throw new Error(response.message || 'Failed to create product')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create product'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  return {
+    createProduct,
     isLoading,
     error,
   }
