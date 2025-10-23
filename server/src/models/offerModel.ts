@@ -12,7 +12,8 @@ export class OfferModel {
         u.name as "userName",
         o.offer_by as "offerBy",
         o.price_amount as "priceAmount",
-        o.accepted_at as "acceptedAt"
+        o.accepted_at as "acceptedAt",
+        o.accepted_by as "acceptedBy"
       FROM offer o
       JOIN "user" u ON o.user_id = u.id
       WHERE o.id = $1

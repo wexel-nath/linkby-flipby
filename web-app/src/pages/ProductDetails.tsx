@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
-import { useProductWithOffers } from '@/hooks/use-offers'
+import { useAcceptOffer, useCreateOffer, useProductWithOffers } from '@/hooks/use-offers'
 import { usePurchaseProduct } from '@/hooks/use-products'
 import { useToast } from '@/hooks/use-toast'
 import { formatPrice, getProductReservedFor } from '@/lib/utils'
@@ -46,6 +46,8 @@ const ProductDetails = () => {
 
   const { product, offers: productOffers, isLoading } = useProductWithOffers(id || '')
   const { purchaseProduct, isLoading: isPurchasing, error: purchaseError } = usePurchaseProduct()
+  const { createOffer, isLoading: isCreatingOffer, error: createOfferError } = useCreateOffer()
+  const { acceptOffer, isLoading: isAcceptingOffer, error: acceptOfferError } = useAcceptOffer()
 
   if (isLoading) {
     return (
@@ -92,7 +94,7 @@ const ProductDetails = () => {
     }
   }
 
-  const handleMakeOffer = () => {
+  const handleMakeOffer = async () => {
     if (!offerPrice || parseFloat(offerPrice) <= 0) {
       toast({
         title: 'Invalid price',
@@ -101,17 +103,56 @@ const ProductDetails = () => {
       })
       return
     }
-    toast({
-      title: 'Offer sent',
-      description: 'Your counter-offer has been submitted',
-    })
-    setShowOfferDialog(false)
-    setOfferPrice('')
+
+    if (!id) return
+
+    try {
+      const offerBy = product.userId === user?.id ? OfferBy.Seller : OfferBy.Buyer
+
+      await createOffer({
+        productId: id,
+        offerBy,
+        priceAmount: Math.round(parseFloat(offerPrice) * 100),
+      })
+
+      toast({
+        title: 'Offer sent',
+        description: 'Your counter-offer has been submitted',
+      })
+      setShowOfferDialog(false)
+      setOfferPrice('')
+
+      // Refresh the page to show the new offer
+      window.location.reload()
+    } catch (err) {
+      toast({
+        title: 'Failed to create offer',
+        description: createOfferError || 'Failed to create offer. Please try again.',
+        variant: 'destructive',
+      })
+    }
   }
 
-  const handleAcceptOffer = () => {
-    toast({ title: 'Offer accepted', description: 'Product is now reserved' })
-    navigate('/')
+  const handleAcceptOffer = async (offerId: string) => {
+    if (!id) {
+      return
+    }
+
+    try {
+      await acceptOffer(id, offerId)
+      toast({
+        title: 'Offer accepted',
+        description: 'Product is now reserved',
+      })
+      // Refresh the page to show the accepted offer
+      window.location.reload()
+    } catch (err) {
+      toast({
+        title: 'Failed to accept offer',
+        description: acceptOfferError || 'Failed to accept offer. Please try again.',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (
@@ -194,7 +235,7 @@ const ProductDetails = () => {
                         key={offer.id}
                         offer={offer}
                         isActionable={isActionable}
-                        onAcceptOffer={handleAcceptOffer}
+                        onAcceptOffer={() => handleAcceptOffer(offer.id)}
                         onMakeCounterOffer={() => setShowOfferDialog(true)}
                       />
                     )
@@ -229,7 +270,9 @@ const ProductDetails = () => {
             <Button variant="outline" onClick={() => setShowOfferDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleMakeOffer}>Submit Offer</Button>
+            <Button onClick={handleMakeOffer} disabled={isCreatingOffer}>
+              {isCreatingOffer ? 'Submitting...' : 'Submit Offer'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

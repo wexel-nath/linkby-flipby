@@ -73,9 +73,6 @@ export const useCreateOffer = () => {
 
       const response = await apiService.request<Offer>(`/products/${offerData.productId}/offers`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(offerData),
       })
 
@@ -95,6 +92,43 @@ export const useCreateOffer = () => {
 
   return {
     createOffer,
+    isLoading,
+    error,
+  }
+}
+
+export const useAcceptOffer = () => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const acceptOffer = useCallback(async (productId: string, offerId: string) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await apiService.request<Offer>(
+        `/products/${productId}/offers/${offerId}/accept`,
+        {
+          method: 'PUT',
+        },
+      )
+
+      if (response.data) {
+        return response.data
+      } else {
+        throw new Error(response.message || 'Failed to accept offer')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to accept offer'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  return {
+    acceptOffer,
     isLoading,
     error,
   }

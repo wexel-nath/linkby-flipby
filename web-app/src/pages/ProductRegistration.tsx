@@ -48,7 +48,7 @@ const ProductRegistration = () => {
     try {
       const productData = {
         name,
-        priceAmount: Number(amount) * 100, // Convert to cents
+        priceAmount: Math.round(Number(amount) * 100),
         priceCurrency: currency,
         description,
       }
