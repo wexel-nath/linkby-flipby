@@ -41,7 +41,8 @@ export class OfferModel {
         u.name as "userName",
         o.offer_by as "offerBy",
         o.price_amount as "priceAmount",
-        o.accepted_at as "acceptedAt"
+        o.accepted_at as "acceptedAt",
+        o.accepted_by as "acceptedBy"
       FROM offer o
       JOIN "user" u ON o.user_id = u.id
       WHERE o.id = $1
@@ -64,7 +65,8 @@ export class OfferModel {
         u.name as "userName",
         o.offer_by as "offerBy",
         o.price_amount as "priceAmount",
-        o.accepted_at as "acceptedAt"
+        o.accepted_at as "acceptedAt",
+        o.accepted_by as "acceptedBy"
       FROM offer o
       JOIN "user" u ON o.user_id = u.id
       WHERE o.product_id = $1
@@ -85,7 +87,8 @@ export class OfferModel {
         u.name as "userName",
         o.offer_by as "offerBy",
         o.price_amount as "priceAmount",
-        o.accepted_at as "acceptedAt"
+        o.accepted_at as "acceptedAt",
+        o.accepted_by as "acceptedBy"
       FROM offer o
       JOIN "user" u ON o.user_id = u.id
       WHERE o.user_id = $1
@@ -96,13 +99,21 @@ export class OfferModel {
     return result.rows as Offer[]
   }
 
-  async acceptOffer(id: string): Promise<Offer | null> {
+  async acceptOffer(offerId: string, userId: string): Promise<Offer | null> {
     const updateQuery = `
       UPDATE offer 
-      SET accepted_at = NOW() 
-      WHERE id = $1
+      SET
+        accepted_at = NOW(),
+        accepted_by = $1
+      WHERE id = $2
       RETURNING id
     `
+    const updateResult = await pool.query(updateQuery, [userId, offerId])
+
+    if (updateResult.rows.length === 0) {
+      return null
+    }
+
     const selectQuery = `
       SELECT 
         o.id,
@@ -112,18 +123,13 @@ export class OfferModel {
         u.name as "userName",
         o.offer_by as "offerBy",
         o.price_amount as "priceAmount",
-        o.accepted_at as "acceptedAt"
+        o.accepted_at as "acceptedAt",
+        o.accepted_by as "acceptedBy"
       FROM offer o
       JOIN "user" u ON o.user_id = u.id
       WHERE o.id = $1
     `
-    const updateResult = await pool.query(updateQuery, [id])
-
-    if (updateResult.rows.length === 0) {
-      return null
-    }
-
-    const selectResult = await pool.query(selectQuery, [id])
+    const selectResult = await pool.query(selectQuery, [offerId])
     return selectResult.rows[0] as Offer
   }
 
@@ -137,7 +143,8 @@ export class OfferModel {
         u.name as "userName",
         o.offer_by as "offerBy",
         o.price_amount as "priceAmount",
-        o.accepted_at as "acceptedAt"
+        o.accepted_at as "acceptedAt",
+        o.accepted_by as "acceptedBy"
       FROM offer o
       JOIN "user" u ON o.user_id = u.id
       ORDER BY o.created_at DESC

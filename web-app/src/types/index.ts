@@ -22,8 +22,8 @@ export interface Product {
   priceCurrency: string
   description: string
   images: string[]
+  purchasedBy?: string
   status: ProductStatus
-  reservedForBuyerId?: string
 }
 
 export enum OfferBy {
@@ -40,4 +40,5 @@ export interface Offer {
   offerBy: OfferBy
   priceAmount: number
   acceptedAt?: Date
+  acceptedBy?: string
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { apiService } from '@/services/api'
-import { Product, ProductStatus } from '@/types'
+import { Product } from '@/types'
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -52,10 +52,6 @@ export const useProducts = () => {
     isLoading,
     error,
     refetch,
-    // Filtered products
-    availableProducts: products.filter((p) => p.status === ProductStatus.Available),
-    reservedProducts: products.filter((p) => p.status === ProductStatus.Reserved),
-    soldProducts: products.filter((p) => p.status === ProductStatus.Sold),
   }
 }
 
@@ -144,6 +140,40 @@ export const useCreateProduct = () => {
 
   return {
     createProduct,
+    isLoading,
+    error,
+  }
+}
+
+export const usePurchaseProduct = () => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const purchaseProduct = useCallback(async (productId: string) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await apiService.request<Product>(`/products/${productId}/purchase`, {
+        method: 'PUT',
+      })
+
+      if (response.data) {
+        return response.data
+      } else {
+        throw new Error(response.message || 'Failed to purchase product')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to purchase product'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  return {
+    purchaseProduct,
     isLoading,
     error,
   }

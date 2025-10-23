@@ -12,6 +12,7 @@ export interface Offer {
   offerBy: OfferBy
   priceAmount: number
   acceptedAt?: Date
+  acceptedBy?: string
 }
 
 export interface CreateOfferRequest {

@@ -17,6 +17,7 @@ export class ProductController {
 
       ResponseWrapper.success(res, product)
     } catch (error) {
+      console.error(error)
       ResponseWrapper.error(res, 'Internal server error', 500)
     }
   }
@@ -59,6 +60,7 @@ export class ProductController {
       if (error instanceof Error) {
         ResponseWrapper.error(res, error.message, 400)
       } else {
+        console.error(error)
         ResponseWrapper.error(res, 'Internal server error', 500)
       }
     }
@@ -70,6 +72,25 @@ export class ProductController {
 
       ResponseWrapper.success(res, products)
     } catch (error) {
+      console.error(error)
+      ResponseWrapper.error(res, 'Internal server error', 500)
+    }
+  }
+
+  async purchaseProduct(req: Request, res: Response): Promise<void> {
+    try {
+      const { productId } = req.params
+      const userId = req.user?.id
+      if (!userId) {
+        ResponseWrapper.error(res, 'User not authenticated', 401)
+        return
+      }
+
+      const product = await productService.purchaseProduct(productId, userId)
+
+      ResponseWrapper.success(res, product)
+    } catch (error) {
+      console.error(error)
       ResponseWrapper.error(res, 'Internal server error', 500)
     }
   }

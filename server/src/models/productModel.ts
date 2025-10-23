@@ -1,5 +1,5 @@
 import { pool } from '../db/connection'
-import { CreateProductRequest, Product, ProductStatus } from '../types'
+import { CreateProductRequest, Product } from '../types'
 
 export class ProductModel {
   async getById(id: string): Promise<Product | null> {
@@ -14,18 +14,16 @@ export class ProductModel {
         p.price_currency as "priceCurrency",
         p.description,
         p.images,
-        p.status,
+        p.purchased_by as "purchasedBy",
         CASE
-          WHEN p.status = 'Reserved' THEN (
-            SELECT o.user_id 
+          WHEN p.purchased_by IS NOT NULL THEN 'Sold'
+          WHEN EXISTS (
+            SELECT 1
             FROM offer o 
-            WHERE o.product_id = p.id 
-              AND o.accepted_at IS NOT NULL 
-              AND o.offer_by = 'Buyer'
-            LIMIT 1
-          )
-          ELSE NULL
-        END as "reservedForBuyerId"
+            WHERE o.product_id = p.id AND o.accepted_at IS NOT NULL
+          ) THEN 'Reserved'
+          ELSE 'Available'
+        END as "status"
       FROM product p
       JOIN "user" u ON p.user_id = u.id
       WHERE p.id = $1
@@ -41,9 +39,9 @@ export class ProductModel {
 
   async create(productData: CreateProductRequest, userId: string): Promise<Product> {
     const query = `
-      INSERT INTO product (user_id, name, price_amount, price_currency, description, images, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, created_at as "createdAt", user_id as "userId"
+      INSERT INTO product (user_id, name, price_amount, price_currency, description, images)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id
     `
     const args = [
       userId,
@@ -52,7 +50,6 @@ export class ProductModel {
       productData.priceCurrency,
       productData.description,
       productData.images,
-      productData.status,
     ]
     const result = await pool.query(query, args)
 
@@ -75,18 +72,16 @@ export class ProductModel {
         p.price_currency as "priceCurrency",
         p.description,
         p.images,
-        p.status,
-        CASE 
-          WHEN p.status = 'Reserved' THEN (
-            SELECT o.user_id 
+        p.purchased_by as "purchasedBy",
+        CASE
+          WHEN p.purchased_by IS NOT NULL THEN 'Sold'
+          WHEN EXISTS (
+            SELECT 1
             FROM offer o 
-            WHERE o.product_id = p.id 
-              AND o.accepted_at IS NOT NULL 
-              AND o.offer_by = 'Buyer'
-            LIMIT 1
-          )
-          ELSE NULL
-        END as "reservedForBuyerId"
+            WHERE o.product_id = p.id AND o.accepted_at IS NOT NULL
+          ) THEN 'Reserved'
+          ELSE 'Available'
+        END as "status"
       FROM product p
       JOIN "user" u ON p.user_id = u.id
       ORDER BY p.created_at DESC
@@ -108,18 +103,16 @@ export class ProductModel {
         p.price_currency as "priceCurrency",
         p.description,
         p.images,
-        p.status,
-        CASE 
-          WHEN p.status = 'Reserved' THEN (
-            SELECT o.user_id 
+        p.purchased_by as "purchasedBy",
+        CASE
+          WHEN p.purchased_by IS NOT NULL THEN 'Sold'
+          WHEN EXISTS (
+            SELECT 1
             FROM offer o 
-            WHERE o.product_id = p.id 
-              AND o.accepted_at IS NOT NULL 
-              AND o.offer_by = 'Buyer'
-            LIMIT 1
-          )
-          ELSE NULL
-        END as "reservedForBuyerId"
+            WHERE o.product_id = p.id AND o.accepted_at IS NOT NULL
+          ) THEN 'Reserved'
+          ELSE 'Available'
+        END as "status"
       FROM product p
       JOIN "user" u ON p.user_id = u.id
       WHERE p.user_id = $1
@@ -130,9 +123,9 @@ export class ProductModel {
     return result.rows as Product[]
   }
 
-  async updateStatus(id: string, status: ProductStatus): Promise<Product | null> {
-    const query = 'UPDATE product SET status = $1 WHERE id = $2'
-    await pool.query(query, [status, id])
+  async updatePurchasedBy(id: string, purchasedBy: string): Promise<Product | null> {
+    const query = 'UPDATE product SET purchased_by = $1 WHERE id = $2'
+    await pool.query(query, [purchasedBy, id])
 
     return this.getById(id)
   }

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { formatPrice } from '@/lib/utils'
 import { Offer } from '@/types'
 
 interface OfferItemProps {
@@ -45,7 +46,7 @@ export const OfferItem = ({
 
           <div className="flex flex-col items-end gap-2">
             <div className="flex items-center gap-2">
-              <div className="font-semibold">${offer.priceAmount}</div>
+              <div className="font-semibold">{formatPrice(offer.priceAmount)}</div>
             </div>
             {!!offer.acceptedAt && <Badge>Accepted</Badge>}
             {isActionable && (

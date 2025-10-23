@@ -1,48 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { apiService } from '@/services/api'
-import { Offer, Product } from '@/types'
-
-export const useOffersByProduct = (productId: string) => {
-  const [offers, setOffers] = useState<Offer[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchProductOffers = async () => {
-      if (!productId) {
-        setOffers([])
-        setIsLoading(false)
-        return
-      }
-
-      try {
-        setIsLoading(true)
-        setError(null)
-
-        const response = await apiService.request<Offer[]>(`/products/${productId}/offers`)
-        if (response.data) {
-          setOffers(response.data)
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch product offers')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchProductOffers()
-  }, [productId])
-
-  return {
-    offers,
-    isLoading,
-    error,
-    hasOffers: offers.length > 0,
-    acceptedOffers: offers.filter((o) => o.acceptedAt),
-    pendingOffers: offers.filter((o) => !o.acceptedAt),
-  }
-}
+import { Offer, OfferBy, Product } from '@/types'
 
 // Combined hook for product with its offers
 export const useProductWithOffers = (productId: string) => {
@@ -94,5 +53,49 @@ export const useProductWithOffers = (productId: string) => {
     hasOffers: offers.length > 0,
     acceptedOffers: offers.filter((o) => o.acceptedAt),
     pendingOffers: offers.filter((o) => !o.acceptedAt),
+  }
+}
+
+export interface CreateOfferData {
+  productId: string
+  offerBy: OfferBy
+  priceAmount: number
+}
+
+export const useCreateOffer = () => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const createOffer = useCallback(async (offerData: CreateOfferData) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await apiService.request<Offer>(`/products/${offerData.productId}/offers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(offerData),
+      })
+
+      if (response.data) {
+        return response.data
+      } else {
+        throw new Error(response.message || 'Failed to create offer')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create offer'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  return {
+    createOffer,
+    isLoading,
+    error,
   }
 }

@@ -19,7 +19,9 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigateToLogin } from '@/hooks/use-navigate-to-login'
 import { useProductWithOffers } from '@/hooks/use-offers'
+import { usePurchaseProduct } from '@/hooks/use-products'
 import { useToast } from '@/hooks/use-toast'
+import { formatPrice, getProductReservedFor } from '@/lib/utils'
 import { OfferBy, ProductStatus } from '@/types'
 
 const getProductBadgeVariant = (status: ProductStatus): BadgeProps['variant'] => {
@@ -43,6 +45,7 @@ const ProductDetails = () => {
   const navigateToLogin = useNavigateToLogin()
 
   const { product, offers: productOffers, isLoading } = useProductWithOffers(id || '')
+  const { purchaseProduct, isLoading: isPurchasing, error: purchaseError } = usePurchaseProduct()
 
   if (isLoading) {
     return (
@@ -68,15 +71,25 @@ const ProductDetails = () => {
     (lastOffer && !!lastOffer.acceptedAt) ||
     (lastOffer && lastOffer.offerBy === OfferBy.Buyer && !!lastOffer.acceptedAt)
 
-  const isReservedForAnotherBuyer =
-    product.status === ProductStatus.Reserved && product.reservedForBuyerId !== user?.id
+  const isReservedForAnotherBuyer = getProductReservedFor(sortedOffers, product) !== user?.id
 
-  const handlePurchase = () => {
-    toast({
-      title: 'Purchase complete',
-      description: 'Product marked as sold',
-    })
-    navigate('/')
+  const handlePurchase = async () => {
+    if (!id) return
+
+    try {
+      await purchaseProduct(id)
+      toast({
+        title: 'Purchase complete',
+        description: 'Product purchased successfully',
+      })
+      navigate('/')
+    } catch (err) {
+      toast({
+        title: 'Purchase failed',
+        description: purchaseError || 'Failed to purchase product. Please try again.',
+        variant: 'destructive',
+      })
+    }
   }
 
   const handleMakeOffer = () => {
@@ -123,7 +136,7 @@ const ProductDetails = () => {
                 <h1 className="text-3xl font-bold">{product.name}</h1>
                 <Badge variant={getProductBadgeVariant(product.status)}>{product.status}</Badge>
               </div>
-              <p className="text-2xl font-bold text-primary">${product.priceAmount}</p>
+              <p className="text-2xl font-bold text-primary">{formatPrice(product.priceAmount)}</p>
               <p className="text-sm text-muted-foreground">Listed by {product.userName}</p>
             </div>
 
@@ -143,8 +156,8 @@ const ProductDetails = () => {
             {user && !isSeller && product.status === ProductStatus.Available && (
               <div className="space-y-2">
                 {canPurchase && (
-                  <Button className="w-full" onClick={handlePurchase}>
-                    Purchase Now
+                  <Button className="w-full" onClick={handlePurchase} disabled={isPurchasing}>
+                    {isPurchasing ? 'Purchasing...' : 'Purchase Now'}
                   </Button>
                 )}
                 {!hasActiveOffer && (

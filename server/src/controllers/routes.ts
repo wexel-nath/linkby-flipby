@@ -22,6 +22,9 @@ router.post('/products', authenticateToken, uploadProductImages, (req, res) =>
 )
 router.get('/products', (req, res) => productController.getAllProducts(req, res))
 router.get('/products/:productId', (req, res) => productController.getProduct(req, res))
+router.put('/products/:productId/purchase', authenticateToken, (req, res) =>
+  productController.purchaseProduct(req, res),
+)
 
 // Offer routes
 router.get('/products/:productId/offers', (req, res) => offerController.getProductOffers(req, res))

@@ -23,6 +23,7 @@ export class UserController {
 
       ResponseWrapper.success(res, user)
     } catch (error) {
+      console.error(error)
       ResponseWrapper.error(res, 'Internal server error', 500)
     }
   }
@@ -37,6 +38,7 @@ export class UserController {
       if (error instanceof Error) {
         ResponseWrapper.error(res, error.message, 400)
       } else {
+        console.error(error)
         ResponseWrapper.error(res, 'Internal server error', 500)
       }
     }
@@ -70,6 +72,7 @@ export class UserController {
       if (error instanceof Error) {
         ResponseWrapper.error(res, error.message, 400)
       } else {
+        console.error(error)
         ResponseWrapper.error(res, 'Internal server error', 500)
       }
     }

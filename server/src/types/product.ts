@@ -14,8 +14,8 @@ export interface Product {
   priceCurrency: string
   description: string
   images: string[]
+  purchasedBy?: string
   status: ProductStatus
-  reservedForBuyerId?: string
 }
 
 export interface CreateProductRequest {
@@ -24,5 +24,4 @@ export interface CreateProductRequest {
   priceCurrency: string
   description: string
   images: string[]
-  status: ProductStatus
 }

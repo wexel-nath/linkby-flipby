@@ -1,5 +1,5 @@
 import { productModel } from '../models'
-import { CreateProductRequest, Product, ProductStatus } from '../types'
+import { CreateProductRequest, Product } from '../types'
 
 export class ProductService {
   async getProductById(id: string): Promise<Product | null> {
@@ -30,8 +30,6 @@ export class ProductService {
       throw new Error('Maximum 5 images allowed')
     }
 
-    productData.status = ProductStatus.Available
-
     return productModel.create(productData, userId)
   }
 
@@ -39,22 +37,22 @@ export class ProductService {
     return productModel.getAll()
   }
 
-  async updateProductStatus(
-    id: string,
-    status: ProductStatus,
-    userId: string,
-  ): Promise<Product | null> {
-    // Verify the product belongs to the user
-    const product = await productModel.getById(id)
+  async purchaseProduct(productId: string, userId: string): Promise<Product | null> {
+    // Verify the product does not belong to the user
+    const product = await productModel.getById(productId)
     if (!product) {
       throw new Error('Product not found')
     }
 
-    if (product.userId !== userId) {
-      throw new Error('Not authorized to update this product')
+    if (product.userId === userId) {
+      throw new Error('Cannot purchase your own product')
     }
 
-    return productModel.updateStatus(id, status)
+    if (!!product.purchasedBy) {
+      throw new Error('Product already purchased')
+    }
+
+    return productModel.updatePurchasedBy(productId, userId)
   }
 }
 

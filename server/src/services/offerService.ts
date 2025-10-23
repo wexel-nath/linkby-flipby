@@ -1,5 +1,5 @@
 import { offerModel, productModel } from '../models'
-import { CreateOfferRequest, Offer, OfferBy, ProductStatus } from '../types'
+import { CreateOfferRequest, Offer, OfferBy } from '../types'
 
 export class OfferService {
   async createOffer(offerData: CreateOfferRequest, userId: string): Promise<Offer> {
@@ -12,10 +12,6 @@ export class OfferService {
     const product = await productModel.getById(offerData.productId)
     if (!product) {
       throw new Error('Product not found')
-    }
-
-    if (product.status !== ProductStatus.Available) {
-      throw new Error('Product is not available for offers')
     }
 
     // Prevent users from making offers on their own products
@@ -51,14 +47,7 @@ export class OfferService {
       throw new Error('Only offer maker can accept seller offers')
     }
 
-    // Accept the offer
-    const acceptedOffer = await offerModel.acceptOffer(offerId)
-
-    // Update product status to Reserved
-    if (acceptedOffer) {
-      await productModel.updateStatus(product.id, ProductStatus.Reserved)
-    }
-
+    const acceptedOffer = await offerModel.acceptOffer(offerId, userId)
     return acceptedOffer
   }
 }

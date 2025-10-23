@@ -11,12 +11,6 @@ CREATE TABLE "user" (
     password_hash TEXT NOT NULL
 );
 
-CREATE TYPE PRODUCT_STATUS AS ENUM(
-    'Available',
-    'Reserved',
-    'Sold'
-);
-
 CREATE TABLE product (
     id             UUID PRIMARY KEY DEFAULT UUID_GENERATE_V4(),
     created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -26,7 +20,7 @@ CREATE TABLE product (
     price_currency TEXT NOT NULL,
     description    TEXT NOT NULL,
     images         TEXT[] NOT NULL,
-    status         PRODUCT_STATUS NOT NULL
+    purchased_by   UUID REFERENCES "user" (id)
 );
 
 CREATE TYPE OFFER_BY AS ENUM(
@@ -41,7 +35,8 @@ CREATE TABLE offer (
     user_id       UUID NOT NULL REFERENCES "user" (id),
     offer_by      OFFER_BY NOT NULL,
     price_amount  INTEGER NOT NULL,
-    accepted_at   TIMESTAMP WITH TIME ZONE
+    accepted_at   TIMESTAMP WITH TIME ZONE,
+    accepted_by   UUID REFERENCES "user" (id)
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE "user" TO flipby_server;
