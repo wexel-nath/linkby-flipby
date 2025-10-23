@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 
 import { productService } from '../services'
+import { convertFilePathsToUrls } from '../utils/imageUtils'
 import { ResponseWrapper } from '../utils/responseWrapper'
 
 export class ProductController {
@@ -22,14 +23,36 @@ export class ProductController {
 
   async createProduct(req: Request, res: Response): Promise<void> {
     try {
-      const productData = req.body
       const userId = req.user?.id
       if (!userId) {
         ResponseWrapper.error(res, 'User not authenticated', 401)
         return
       }
 
-      const product = await productService.createProduct(productData, userId)
+      // Handle multipart form data
+      const files = req.files as Express.Multer.File[]
+      const { productData } = req.body
+
+      // Parse JSON product data from form field
+      let parsedProductData
+      try {
+        parsedProductData = typeof productData === 'string' ? JSON.parse(productData) : productData
+      } catch (error) {
+        ResponseWrapper.error(res, 'Invalid product data JSON', 400)
+        return
+      }
+
+      // Extract image paths from uploaded files and convert to URLs
+      const imagePaths = files ? files.map((file) => file.path) : []
+      const imageUrls = convertFilePathsToUrls(imagePaths)
+
+      // Combine parsed data with image URLs
+      const completeProductData = {
+        ...parsedProductData,
+        images: imageUrls,
+      }
+
+      const product = await productService.createProduct(completeProductData, userId)
 
       ResponseWrapper.success(res, product, 201)
     } catch (error) {

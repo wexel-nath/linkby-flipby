@@ -12,9 +12,13 @@ export class ProductService {
       throw new Error('Price amount must be positive')
     }
 
-    // Validate images array is not empty
-    if (!productData.images || productData.images.length === 0) {
-      throw new Error('At least one image is required')
+    // Default to empty array if images are not provided
+    if (!productData.images) {
+      productData.images = []
+    }
+
+    if (productData.images.length > 5) {
+      throw new Error('Maximum 5 images allowed')
     }
 
     return productModel.create(productData, userId)

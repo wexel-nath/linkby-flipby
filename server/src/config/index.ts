@@ -4,6 +4,8 @@ export interface Config {
   databaseUrl: string
   jwtSecret: string
   jwtExpiresIn: string
+  uploadsDir: string
+  baseUrl: string
 }
 
 export const config: Config = {
@@ -12,4 +14,6 @@ export const config: Config = {
   databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || 'jwt-secret',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
+  uploadsDir: process.env.UPLOADS_DIR || './uploads',
+  baseUrl: process.env.BASE_URL || '',
 }

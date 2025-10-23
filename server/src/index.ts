@@ -1,3 +1,4 @@
+import path from 'path'
 import cors from 'cors'
 import express from 'express'
 
@@ -11,6 +12,9 @@ const app = express()
 // Middleware
 app.use(cors())
 app.use(express.json())
+
+// Serve static files (uploaded images)
+app.use('/uploads', express.static(config.uploadsDir))
 
 // Routes
 app.use('/', routes)

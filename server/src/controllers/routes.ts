@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import { authenticateToken } from '../middleware'
+import { uploadProductImages } from '../middleware/upload'
 import { healthController, offerController, productController, userController } from './index'
 
 const router = Router()
@@ -16,7 +17,9 @@ router.post('/users', (req, res) => userController.createUser(req, res))
 router.get('/user', authenticateToken, (req, res) => userController.getUser(req, res))
 
 // Product routes
-router.post('/products', authenticateToken, (req, res) => productController.createProduct(req, res))
+router.post('/products', authenticateToken, uploadProductImages, (req, res) =>
+  productController.createProduct(req, res),
+)
 router.get('/products', (req, res) => productController.getAllProducts(req, res))
 router.get('/products/:productId', (req, res) => productController.getProduct(req, res))
 

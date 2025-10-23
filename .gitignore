@@ -4,3 +4,6 @@ package-lock.json
 
 # IDE
 .DS_Store
+
+# Uploads
+uploads/
