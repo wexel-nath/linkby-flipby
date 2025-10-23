@@ -11,7 +11,8 @@ import { useToast } from '@/hooks/use-toast'
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login, user } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { login, user, isLoading } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
   const [searchParams] = useSearchParams()
@@ -24,17 +25,29 @@ const Login = () => {
     }
   }, [user, navigate, target])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const success = login(email, password)
-    if (success) {
-      navigate(target)
-    } else {
+    setIsSubmitting(true)
+
+    try {
+      const success = await login(email, password)
+      if (success) {
+        navigate(target)
+      } else {
+        toast({
+          title: 'Login failed',
+          description: 'Invalid email or password',
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
       toast({
         title: 'Login failed',
-        description: 'Invalid email or password',
+        description: 'An error occurred during login',
         variant: 'destructive',
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -69,13 +82,12 @@ const Login = () => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={isSubmitting || isLoading}>
+              {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
           </form>
           <p className="mt-4 text-sm text-muted-foreground">
-            Demo accounts: john@example.com, jane@example.com, bob@example.com (password:
-            password123)
+            Use your account credentials to sign in
           </p>
         </CardContent>
       </Card>

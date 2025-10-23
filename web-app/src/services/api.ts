@@ -7,23 +7,47 @@ export interface ApiResponse<T> {
 
 class ApiService {
   private baseUrl: string
+  private authToken: string | null = null
+  private onUnauthorized: (() => void) | null = null
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl
-    console.log('baseUrl', baseUrl)
+  }
+
+  setAuthToken(token: string) {
+    this.authToken = token
+  }
+
+  clearAuthToken() {
+    this.authToken = null
+  }
+
+  setUnauthorizedHandler(handler: () => void) {
+    this.onUnauthorized = handler
   }
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(options.headers as Record<string, string>),
+      }
+
+      // Add Authorization header if token exists
+      if (this.authToken) {
+        headers.Authorization = `Bearer ${this.authToken}`
+      }
+
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
         ...options,
       })
 
       if (!response.ok) {
+        // Handle 401 Unauthorized - likely expired token
+        if (response.status === 401 && this.onUnauthorized) {
+          this.onUnauthorized()
+        }
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 

@@ -13,7 +13,6 @@ export class JwtUtils {
   static verifyToken(token: string): User {
     try {
       const user = jwt.verify(token, config.jwtSecret) as User
-      console.log('user', user)
       return user
     } catch (error) {
       throw new Error('Invalid or expired token')

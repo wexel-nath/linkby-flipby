@@ -20,8 +20,7 @@ export const useOffersByProduct = (productId: string) => {
         setIsLoading(true)
         setError(null)
 
-        const response = await apiService.request<Offer[]>(`/offers?productId=${productId}`)
-
+        const response = await apiService.request<Offer[]>(`/products/${productId}/offers`)
         if (response.data) {
           setOffers(response.data)
         }
@@ -67,7 +66,7 @@ export const useProductWithOffers = (productId: string) => {
 
         const [productResponse, offersResponse] = await Promise.all([
           apiService.request<Product>(`/products/${productId}`),
-          apiService.request<Offer[]>(`/offers?productId=${productId}`),
+          apiService.request<Offer[]>(`/products/${productId}/offers`),
         ])
 
         if (productResponse.data) {
