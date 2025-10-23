@@ -54,7 +54,9 @@ const ProductDetails = () => {
     return <div>Product not found</div>
   }
 
-  const sortedOffers = productOffers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  const sortedOffers = productOffers.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
 
   const isSeller = user?.id === product.userId
 

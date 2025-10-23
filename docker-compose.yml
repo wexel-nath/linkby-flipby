@@ -16,6 +16,9 @@ services:
       context: ./web-app
       dockerfile: Dockerfile
     restart: no
+    environment:
+      APP_PREFIX: PREFIX_
+      PREFIX_API_BASE_URL: 'http://localhost:${FLIPBY_SERVER_PORT}'
     ports:
       - '${FLIPBY_WEB_APP_PORT}:8080'
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { mockProducts } from '@/data/mockData'
+import { apiService } from '@/services/api'
 import { Product, ProductStatus } from '@/types'
 
 export const useProducts = () => {
@@ -14,14 +14,11 @@ export const useProducts = () => {
         setIsLoading(true)
         setError(null)
 
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const response = await apiService.request<Product[]>('/products')
 
-        // TODO: Replace with actual API call
-        // const response = await fetch('/api/products')
-        // const data = await response.json()
-
-        setProducts([...mockProducts])
+        if (response.data) {
+          setProducts(response.data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch products')
       } finally {
@@ -32,15 +29,22 @@ export const useProducts = () => {
     fetchProducts()
   }, [])
 
-  const refetch = () => {
-    setProducts([])
-    setIsLoading(true)
-    setError(null)
-    // Re-trigger the effect
-    setTimeout(() => {
-      setProducts([...mockProducts])
+  const refetch = async () => {
+    try {
+      setProducts([])
+      setIsLoading(true)
+      setError(null)
+
+      const response = await apiService.request<Product[]>('/products')
+
+      if (response.data) {
+        setProducts(response.data)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch products')
+    } finally {
       setIsLoading(false)
-    }, 100)
+    }
   }
 
   return {
@@ -72,15 +76,11 @@ export const useProduct = (productId: string) => {
         setIsLoading(true)
         setError(null)
 
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const response = await apiService.request<Product>(`/products/${productId}`)
 
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/products/${productId}`)
-        // const data = await response.json()
-
-        const foundProduct = mockProducts.find((p) => p.id === productId)
-        setProduct(foundProduct || null)
+        if (response.data) {
+          setProduct(response.data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch product')
       } finally {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { mockUsers } from '@/data/mockData'
+import { apiService } from '@/services/api'
 import { User } from '@/types'
 
 export const useUsers = () => {
@@ -14,14 +14,11 @@ export const useUsers = () => {
         setIsLoading(true)
         setError(null)
 
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const response = await apiService.request<User[]>('/users')
 
-        // TODO: Replace with actual API call
-        // const response = await fetch('/api/users')
-        // const data = await response.json()
-
-        setUsers([...mockUsers])
+        if (response.data) {
+          setUsers(response.data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch users')
       } finally {
@@ -56,15 +53,11 @@ export const useUser = (userId: string) => {
         setIsLoading(true)
         setError(null)
 
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const response = await apiService.request<User>(`/users/${userId}`)
 
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/users/${userId}`)
-        // const data = await response.json()
-
-        const foundUser = mockUsers.find((u) => u.id === userId)
-        setUser(foundUser || null)
+        if (response.data) {
+          setUser(response.data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch user')
       } finally {

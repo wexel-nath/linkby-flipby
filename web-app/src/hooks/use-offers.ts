@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { mockOffers } from '@/data/mockData'
+import { apiService } from '@/services/api'
 import { Offer, Product } from '@/types'
 
 export const useOffersByProduct = (productId: string) => {
@@ -20,15 +20,11 @@ export const useOffersByProduct = (productId: string) => {
         setIsLoading(true)
         setError(null)
 
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const response = await apiService.request<Offer[]>(`/offers?productId=${productId}`)
 
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/offers?productId=${productId}`)
-        // const data = await response.json()
-
-        const productOffers = mockOffers.filter((o) => o.productId === productId)
-        setOffers(productOffers)
+        if (response.data) {
+          setOffers(response.data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch product offers')
       } finally {
@@ -69,23 +65,18 @@ export const useProductWithOffers = (productId: string) => {
         setIsLoading(true)
         setError(null)
 
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        const [productResponse, offersResponse] = await Promise.all([
+          apiService.request<Product>(`/products/${productId}`),
+          apiService.request<Offer[]>(`/offers?productId=${productId}`),
+        ])
 
-        // TODO: Replace with actual API calls
-        // const [productResponse, offersResponse] = await Promise.all([
-        //   fetch(`/api/products/${productId}`),
-        //   fetch(`/api/offers?productId=${productId}`)
-        // ])
-        // const productData = await productResponse.json()
-        // const offersData = await offersResponse.json()
+        if (productResponse.data) {
+          setProduct(productResponse.data)
+        }
 
-        const { mockProducts } = await import('@/data/mockData')
-        const foundProduct = mockProducts.find((p) => p.id === productId)
-        const productOffers = mockOffers.filter((o) => o.productId === productId)
-
-        setProduct(foundProduct || null)
-        setOffers(productOffers)
+        if (offersResponse.data) {
+          setOffers(offersResponse.data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch product with offers')
       } finally {

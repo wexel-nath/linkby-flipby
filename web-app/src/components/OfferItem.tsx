@@ -38,7 +38,9 @@ export const OfferItem = ({
                 {offer.offerBy}
               </Badge>
             </div>
-            <div className="text-sm text-muted-foreground">{formatDate(offer.createdAt)}</div>
+            <div className="text-sm text-muted-foreground">
+              {formatDate(new Date(offer.createdAt))}
+            </div>
           </div>
 
           <div className="flex flex-col items-end gap-2">
