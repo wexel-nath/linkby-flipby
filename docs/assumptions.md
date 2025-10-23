@@ -1,2 +1,0 @@
-- Anonymous (not logged-in) users can browse and view product listings, including viewing product details. However, they must log in to perform any actions, such as creating new listings, making offers, or reserving/buying products. Any attempt to access a protected function will prompt the user to log in.
-- Price currency will be captured in the data model as it may be important for future functionality, but won't be displayed in the UI currently. The assumption is that the majority of sales on a marketplace like this will be done locally within the same currency region.

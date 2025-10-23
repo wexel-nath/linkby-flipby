@@ -24,7 +24,7 @@ export function formatPrice(priceAmount: number, currency: string = '$'): string
   return `${currency}${dollars.toFixed(2)}`
 }
 
-export function getProductReservedFor(offers: Offer[], product?: Product): string | null {
+export function getProductReservedFor(offers: Offer[]): string | null {
   // Find the first accepted offer
   const acceptedOffer = offers.find((offer) => offer.acceptedAt)
 
@@ -33,12 +33,8 @@ export function getProductReservedFor(offers: Offer[], product?: Product): strin
   }
 
   if (acceptedOffer.offerBy === OfferBy.Buyer) {
-    // Buyer offer accepted: product reserved for the buyer (offer's userId)
     return acceptedOffer.userId
   } else {
-    // Seller offer accepted: Based on server logic, only buyers can accept seller offers
-    // But we don't track who accepted it, so we can't determine the reserved user
-    // This would require additional data structure changes to track acceptedBy
-    return null
+    return acceptedOffer.acceptedBy
   }
 }

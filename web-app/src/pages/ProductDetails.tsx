@@ -47,7 +47,7 @@ const ProductDetails = () => {
   const { product, offers: productOffers, isLoading } = useProductWithOffers(id || '')
   const { purchaseProduct, isLoading: isPurchasing, error: purchaseError } = usePurchaseProduct()
   const { createOffer, isLoading: isCreatingOffer, error: createOfferError } = useCreateOffer()
-  const { acceptOffer, isLoading: isAcceptingOffer, error: acceptOfferError } = useAcceptOffer()
+  const { acceptOffer, error: acceptOfferError } = useAcceptOffer()
 
   if (isLoading) {
     return (
@@ -67,16 +67,15 @@ const ProductDetails = () => {
 
   const userOffers = sortedOffers.filter((o) => o.userId === user?.id)
   const hasActiveOffer = userOffers.length > 0
-  const lastOffer = sortedOffers[0]
-  const canPurchase =
-    !hasActiveOffer ||
-    (lastOffer && !!lastOffer.acceptedAt) ||
-    (lastOffer && lastOffer.offerBy === OfferBy.Buyer && !!lastOffer.acceptedAt)
+  const canPurchase = !hasActiveOffer || userOffers.find((o) => !!o.acceptedAt)
 
-  const isReservedForAnotherBuyer = getProductReservedFor(sortedOffers, product) !== user?.id
+  const reservedFor = getProductReservedFor(sortedOffers)
+  const isReservedForAnotherBuyer = reservedFor && reservedFor !== user?.id
 
   const handlePurchase = async () => {
-    if (!id) return
+    if (!id) {
+      return
+    }
 
     try {
       await purchaseProduct(id)
@@ -194,14 +193,14 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {user && !isSeller && product.status === ProductStatus.Available && (
+            {user && !isSeller && (
               <div className="space-y-2">
-                {canPurchase && (
+                {canPurchase && product.status !== ProductStatus.Sold && (
                   <Button className="w-full" onClick={handlePurchase} disabled={isPurchasing}>
                     {isPurchasing ? 'Purchasing...' : 'Purchase Now'}
                   </Button>
                 )}
-                {!hasActiveOffer && (
+                {!hasActiveOffer && product.status === ProductStatus.Available && (
                   <Button
                     variant="outline"
                     className="w-full"
@@ -223,10 +222,9 @@ const ProductDetails = () => {
               <div>
                 <h2 className="mb-4 text-xl font-semibold">Negotiation History</h2>
                 <div className="space-y-4">
-                  {sortedOffers.map((offer, index) => {
+                  {sortedOffers.map((offer) => {
                     const isActionable =
-                      index === 0 &&
-                      !offer.acceptedAt &&
+                      product.status === ProductStatus.Available &&
                       ((isSeller && offer.offerBy === OfferBy.Buyer) ||
                         (!isSeller && offer.offerBy === OfferBy.Seller))
 
