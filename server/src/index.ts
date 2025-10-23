@@ -4,6 +4,7 @@ import express from 'express'
 import { config } from './config'
 import { routes } from './controllers'
 import { errorHandler } from './middleware'
+import { ResponseWrapper } from './utils/responseWrapper'
 
 const app = express()
 
@@ -13,6 +14,11 @@ app.use(express.json())
 
 // Routes
 app.use('/', routes)
+
+// 404 handler - must be after routes but before error handler
+app.use('*', (req, res) => {
+  ResponseWrapper.error(res, `Route ${req.originalUrl} not found`, 404)
+})
 
 // Error handling middleware (must be last)
 app.use(errorHandler)

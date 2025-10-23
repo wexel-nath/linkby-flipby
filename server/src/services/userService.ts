@@ -6,10 +6,6 @@ export class UserService {
     return userModel.getById(id)
   }
 
-  async getUserByEmail(email: string): Promise<User | null> {
-    return userModel.getByEmail(email)
-  }
-
   async createUser(userData: CreateUserRequest): Promise<User> {
     // Check if user already exists
     const existingUser = await userModel.getByEmail(userData.email)
@@ -20,8 +16,12 @@ export class UserService {
     return userModel.create(userData)
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return userModel.getAll()
+  async authenticateUser(email: string, password: string): Promise<User | null> {
+    if (!email || !password) {
+      throw new Error('Email and password are required')
+    }
+
+    return userModel.authenticateUser(email, password)
   }
 }
 

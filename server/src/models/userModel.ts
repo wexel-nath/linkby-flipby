@@ -52,7 +52,7 @@ export class UserModel {
     return result.rows[0] as User
   }
 
-  async getAll(): Promise<User[]> {
+  async authenticateUser(email: string, password: string): Promise<User | null> {
     const query = `
         SELECT
             id,
@@ -60,11 +60,15 @@ export class UserModel {
             email,
             name
         FROM "user"
-        ORDER BY created_at DESC
-      `
-    const result = await pool.query(query)
+        WHERE email = $1 AND password_hash = crypt($2, password_hash)
+    `
+    const result = await pool.query(query, [email, password])
 
-    return result.rows as User[]
+    if (result.rows.length === 0) {
+      return null
+    }
+
+    return result.rows[0] as User
   }
 }
 

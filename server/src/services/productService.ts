@@ -24,10 +24,6 @@ export class ProductService {
     return productModel.getAll()
   }
 
-  async getProductsByUserId(userId: string): Promise<Product[]> {
-    return productModel.getByUserId(userId)
-  }
-
   async updateProductStatus(
     id: string,
     status: ProductStatus,
@@ -44,11 +40,6 @@ export class ProductService {
     }
 
     return productModel.updateStatus(id, status)
-  }
-
-  async getAvailableProducts(): Promise<Product[]> {
-    const allProducts = await productModel.getAll()
-    return allProducts.filter((product) => product.status === ProductStatus.Available)
   }
 }
 

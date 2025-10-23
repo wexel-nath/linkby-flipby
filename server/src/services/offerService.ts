@@ -2,10 +2,6 @@ import { offerModel, productModel } from '../models'
 import { CreateOfferRequest, Offer, OfferBy, ProductStatus } from '../types'
 
 export class OfferService {
-  async getOfferById(id: string): Promise<Offer | null> {
-    return offerModel.getById(id)
-  }
-
   async createOffer(offerData: CreateOfferRequest, userId: string): Promise<Offer> {
     // Validate price amount is positive
     if (offerData.priceAmount <= 0) {
@@ -32,10 +28,6 @@ export class OfferService {
 
   async getOffersByProductId(productId: string): Promise<Offer[]> {
     return offerModel.getByProductId(productId)
-  }
-
-  async getOffersByUserId(userId: string): Promise<Offer[]> {
-    return offerModel.getByUserId(userId)
   }
 
   async acceptOffer(offerId: string, userId: string): Promise<Offer | null> {
@@ -68,10 +60,6 @@ export class OfferService {
     }
 
     return acceptedOffer
-  }
-
-  async getAllOffers(): Promise<Offer[]> {
-    return offerModel.getAll()
   }
 }
 

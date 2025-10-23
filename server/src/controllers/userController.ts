@@ -1,13 +1,20 @@
 import { Request, Response } from 'express'
 
 import { userService } from '../services'
+import { LoginRequest, LoginResponse } from '../types'
+import { JwtUtils } from '../utils/jwt'
 import { ResponseWrapper } from '../utils/responseWrapper'
 
 export class UserController {
   async getUser(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params
-      const user = await userService.getUserById(id)
+      const userId = req.user?.id
+      if (!userId) {
+        ResponseWrapper.error(res, 'User not authenticated', 401)
+        return
+      }
+
+      const user = await userService.getUserById(userId)
 
       if (!user) {
         ResponseWrapper.error(res, 'User not found', 404)
@@ -35,34 +42,36 @@ export class UserController {
     }
   }
 
-  async getAllUsers(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response): Promise<void> {
     try {
-      const users = await userService.getAllUsers()
-      ResponseWrapper.success(res, users)
-    } catch (error) {
-      ResponseWrapper.error(res, 'Internal server error', 500)
-    }
-  }
+      const { email, password }: LoginRequest = req.body
 
-  async getUserByEmail(req: Request, res: Response): Promise<void> {
-    try {
-      const { email } = req.query
-
-      if (!email || typeof email !== 'string') {
-        ResponseWrapper.error(res, 'Email parameter is required', 400)
+      if (!email || !password) {
+        ResponseWrapper.error(res, 'Email and password are required', 400)
         return
       }
 
-      const user = await userService.getUserByEmail(email)
+      const user = await userService.authenticateUser(email, password)
 
       if (!user) {
-        ResponseWrapper.error(res, 'User not found', 404)
+        ResponseWrapper.error(res, 'Invalid email or password', 401)
         return
       }
 
-      ResponseWrapper.success(res, user)
+      const token = JwtUtils.generateToken(user)
+
+      const response: LoginResponse = {
+        user,
+        token,
+      }
+
+      ResponseWrapper.success(res, response)
     } catch (error) {
-      ResponseWrapper.error(res, 'Internal server error', 500)
+      if (error instanceof Error) {
+        ResponseWrapper.error(res, error.message, 400)
+      } else {
+        ResponseWrapper.error(res, 'Internal server error', 500)
+      }
     }
   }
 }
