@@ -1,1 +1,5 @@
 export * from './healthController'
+export { UserController, userController } from './userController'
+export { ProductController, productController } from './productController'
+export { OfferController, offerController } from './offerController'
+export { routes } from './routes'
